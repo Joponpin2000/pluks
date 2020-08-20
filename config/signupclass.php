@@ -1,5 +1,5 @@
 <?php
-class Signup
+class SignupClass
 {
     public $name = "";
     public $firstname = "";
@@ -37,7 +37,7 @@ class Signup
             }
             else
             {
-                echo "Oops! Something went wrong. Please try again later.";
+                $this->err = "Oops! Something went wrong. Please try again later.";
             }
         }
     }
@@ -46,8 +46,25 @@ class Signup
     public function CreateUser()
     {
         $statement = "INSERT INTO users (username, password, name, email) VALUES (:username, :password, :name, :email)";
-        $this->executeStatement($statement, ['username' => $this->username, 'password' => $this->password, 'name' => $this->name, 'email' => $this->email]);
-        return $this->connection->lastInsertId();
+        if ($this->executeStatement($statement, ['username' => $this->username, 'password' => $this->password, 'name' => $this->name, 'email' => $this->email]))
+        {
+            $this->msg = "Account created successfully! \nProceed to Login.";
+            return $this->connection->lastInsertId();
+        }
+    }
+
+    public function CheckUsername()
+    {
+        $statement = "SELECT * FROM users WHERE username = :username";
+        $result = $this->executeStatement($statement, ['username' => $this->username]);
+        if ($result->rowCount() > 0)
+        {
+            return $this->err = "Username already exist!";
+        }
+        if ($result->rowCount() == 0)
+        {   
+            $this->CreateUser();
+        }
     }
 
     public function validateFirstname($firstname = "")
@@ -106,7 +123,12 @@ class Signup
         }
         else
         {
-            return $this->password = trim($password);
+            $this->password = trim($password);
+
+            if (strlen($this->password) < 6)
+            {
+                return $this->err = "Password should have at least 6 characters.";
+            }
         }
     }
 
@@ -118,9 +140,18 @@ class Signup
         }
         else
         {
-            return $this->confirm_password = trim($confirm_password);
+            $this->confirm_password = trim($confirm_password);
+
+            if (trim($confirm_password) != $this->password)
+            {
+                return $this->err = "Passwords do not match!";
+            }
         }
     }
 
+    public function Name()
+    {
+        $this->name = $this->firstname . " " . $this->lastname;
+    }
 }
 ?>

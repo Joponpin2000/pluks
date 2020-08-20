@@ -1,37 +1,40 @@
 <?php
 
 require_once('config/DatabaseClass.php');
-require_once('config/signup.php');
+require_once('config/signupclass.php');
 
 $err = $msg = "";
 $firstname = $lastname = $email = $username = $password = $confirm_password = "";
 
 if ($_SERVER["REQUEST_METHOD"] =="POST")
 {
-    $database = new DatabaseClass();
-    $validate = new Signup($database);
+    $signup = new SignupClass();
     
-    $validate->validateConfirmPassword($_POST['confirm_password']);
-    $validate->validatePassword($_POST['password']);
-    $validate->validateUsername($_POST['username']);
-    $validate->validateEmail($_POST['email']);
-    $validate->validateLastname($_POST['lastname']);
-    $validate->validateFirstname($_POST['firstname']);
+    $signup->validateConfirmPassword($_POST['confirm_password']);
+    $signup->validatePassword($_POST['password']);
+    $signup->validateUsername($_POST['username']);
+    $signup->validateEmail($_POST['email']);
+    $signup->validateLastname($_POST['lastname']);
+    $signup->validateFirstname($_POST['firstname']);
 
-    $firstname = $validate->firstname;
-    $lastname = $validate->lastname;
-    $email = $validate->email;
-    $username = $validate->username;
-    $password = $validate->password;
-    $confirm_password = $validate->confirm_password;
+    $firstname = $signup->firstname;
+    $lastname = $signup->lastname;
+    $email = $signup->email;
+    $username = $signup->username;
+    $password = $signup->password;
+    $confirm_password = $signup->confirm_password;
     
-    if ($validate->err)
-        $err = $validate->err;
+    if ($signup->err)
+        $err = $signup->err;
     else
     {
-        
+        $signup->Name();
+        $signup->CheckUsername();
+        if ($signup->err)
+            $err = $signup->err;
+        else
+            $msg = $signup->msg;
     }
-    
 }
 
 ?>
