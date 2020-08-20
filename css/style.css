@@ -1,0 +1,23 @@
+body, * {
+    margin: 0;
+    padding: 0;
+    color: green;
+}
+
+header {
+    margin-bottom: 20px;
+    height: 60px;
+}
+
+nav li {
+    margin-right: 20px;
+}
+
+a {
+    color: green;
+}
+
+a:hover {
+    text-decoration: none;
+    color: green;
+}
