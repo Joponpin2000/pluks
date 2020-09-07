@@ -1,6 +1,5 @@
 <?php
 
-require_once('config/DatabaseClass.php');
 require_once('config/signupclass.php');
 
 $err = $msg = "";
@@ -10,19 +9,21 @@ if ($_SERVER["REQUEST_METHOD"] =="POST")
 {
     $signup = new SignupClass();
     
-    $signup->validateConfirmPassword($_POST['confirm_password']);
+    // $signup->validateConfirmPassword($_POST['confirm_password']);
     $signup->validatePassword($_POST['password']);
     $signup->validateUsername($_POST['username']);
     $signup->validateEmail($_POST['email']);
+    $signup->validateType($_POST['type']);
     $signup->validateLastname($_POST['lastname']);
     $signup->validateFirstname($_POST['firstname']);
 
     $firstname = $signup->firstname;
     $lastname = $signup->lastname;
     $email = $signup->email;
+    $type = $signup->type;
     $username = $signup->username;
     $password = $signup->password;
-    $confirm_password = $signup->confirm_password;
+    // $confirm_password = $signup->confirm_password;
     
     if ($signup->err)
         $err = $signup->err;
@@ -57,7 +58,10 @@ if ($_SERVER["REQUEST_METHOD"] =="POST")
             <?php
                 }
             ?>
-                <form action="" method="post">
+                <div id="err">
+                </div>
+                <form action="signup.php" method="post" name="signupForm" onsubmit="return check();">
+                    <fieldset><h1 class="mb-4">Register With Us</h1></fieldset>
                     <div class="row">
                         <div class="col-sm-12 col-md-6 col-lg-6">
                             <div class="form-group">
@@ -77,19 +81,32 @@ if ($_SERVER["REQUEST_METHOD"] =="POST")
                         <input type="text" class="form-control" name="email" value="<?php echo $email; ?>"/>
                     </div>
                     <div class="form-group">
+                        <label for="type">Account Type</label>
+                        <select name="type" class="form-control">
+                            <option value="">-- Type --</option>
+                            <option value="seller">Seller</option>
+                            <option value="buyer">Buyer</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="username">Username</label>
                         <input type="text" class="form-control" name="username" value="<?php echo $username; ?>"/>
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="text" class="form-control" name="password" value="<?php echo $password; ?>"/>
+                        <input type="password" class="form-control" name="password" value="<?php echo $password; ?>"/>
                     </div>
-                    <div class="form-group">
+                    <!--<div class="form-group">
                         <label for="confirm_password">Confirm Password</label>
-                        <input type="text" class="form-control" name="confirm_password" value="<?php echo $confirm_password; ?>"/>
-                    </div>
-                    <div class="form-group">
-                        <input type="submit" class="btn btn-success" value="Signup"/>
+                        <input type="password" class="form-control" name="confirm_password" value="<?php echo $confirm_password; ?>"/>
+                    </div>-->
+                    <div class="row">
+                        <div class="form-group col-md-10">
+                            <input type="submit" class="btn btn-outline-success my-2 my-sm-0"  value="Signup"/>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <a href="login.php" class="btn btn-outline-primary my-2 my-sm-0">Login</a>
+                        </div>
                     </div>
                 </form>
             </div>

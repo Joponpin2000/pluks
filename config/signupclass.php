@@ -6,6 +6,7 @@ class SignupClass
     public $lastname = "";
     public $email = "";
     public $username = "";
+    public $type = "";
     public $password = "";
     public $confirm_password = "";
     public $err = "";
@@ -45,10 +46,11 @@ class SignupClass
     // function to create new user
     public function CreateUser()
     {
-        $statement = "INSERT INTO users (username, password, name, email) VALUES (:username, :password, :name, :email)";
-        if ($this->executeStatement($statement, ['username' => $this->username, 'password' => $this->password, 'name' => $this->name, 'email' => $this->email]))
+        $hashp = password_hash($this->password, PASSWORD_DEFAULT);
+        $statement = "INSERT INTO users (username, password, name, email, type) VALUES (:username, :password, :name, :email, :type)";
+        if ($this->executeStatement($statement, ['username' => $this->username, 'password' => $hashp, 'name' => $this->name, 'email' => $this->email, 'type' => $this->type]))
         {
-            $this->msg = "Account created successfully! \nProceed to Login.";
+            $this->msg = "Account created successfully! \r\nProceed to Login.";
             return $this->connection->lastInsertId();
         }
     }
@@ -99,7 +101,7 @@ class SignupClass
         }
         else
         {
-            return $this->email = trim($email);
+            return $this->email = filter_var(trim($email), FILTER_SANITIZE_EMAIL);
         }
     }
 
@@ -112,6 +114,18 @@ class SignupClass
         else
         {
             return $this->username = trim($username);
+        }
+    }
+
+    public function validateType($type = "")
+    {
+        if (empty(trim($type)))
+        {
+            return $this->err = "Please choose account type.";
+        }
+        else
+        {
+            return $this->type = trim($type);
         }
     }
 
@@ -142,7 +156,7 @@ class SignupClass
         {
             $this->confirm_password = trim($confirm_password);
 
-            if (trim($confirm_password) != $this->password)
+            if ($this->confirm_password != $this->password)
             {
                 return $this->err = "Passwords do not match!";
             }

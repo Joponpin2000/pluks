@@ -1,5 +1,7 @@
 <?php
 
+$site_email = 'pluks@plukssupport.com';
+
 function slug($text)
 {
     // replace non-letter or digits by -
@@ -17,60 +19,26 @@ function slug($text)
     return $text;
 }
 
+// Encrypt cookie
+function encryptCookie($value)
+{
+    $key = hex2bin(openssl_random_pseudo_bytes(4));
 
-function validate_signup($post_firstname, $post_lastname, $post_email, $post_username, $post_password, $post_confirm_password, $msg, $err) {
-    if (empty(trim($post_confirm_password)))
-    {
-        return $err = "Please confirm password.";
-    }
-    else
-    {
-        return $confirm_password = trim($post_confirm_password);
-    }
-    
-    if (empty(trim($post_password)))
-    {
-        return $err = "Please enter password.";
-    }
-    else
-    {
-        return $password = trim($post_password);
-    }
-    
-    if (empty(trim($post_username)))
-    {
-        return $err = "Please enter username.";
-    }
-    else
-    {
-        return $username = trim($post_username);
-    }
-    
-    if (empty(trim($post_email)))
-    {
-        return $err = "Please enter email.";
-    }
-    else
-    {
-        return $email = trim($post_email);
-    }
+    $cipher = "aes-256-cbc";
+    $ivlen = openssl_cipher_iv_length($cipher);
+    $iv = openssl_random_pseudo_bytes($ivlen);
 
-    if (empty(trim($post_lastname)))
-    {
-        return $err = "Please enter lastname.";
-    }
-    else
-    {
-        return $lastname = trim($post_lastname);
-    }
+    $ciphertext = openssl_encrypt($value, $cipher, $key, 0, $iv);
 
-    if (empty(trim($post_firstname)))
-    {
-        return $err = "Please enter firstname.";
-    }
-    else
-    {
-        return $firstname = trim($post_firstname);
-    }
+    return(base64_encode($ciphertext . '::' . $iv . '::' . $key));
+}
+
+// Decrypt cookie
+function decryptCookie($ciphertext)
+{
+    $cipher = "aes-256-cbc";
+
+    list($encrypted_data, $iv, $key) = explode('::', base64_decode($ciphertext));
+    return openssl_decrypt($encrypted_data, $cipher, $key, 0, $iv);
 }
 ?>
